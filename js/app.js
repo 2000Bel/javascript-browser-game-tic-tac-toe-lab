@@ -59,13 +59,13 @@ function handleClick (event) {
     event.target.textContent = turn;
 
     if(checkWinner()){
-        messageEl.textContent = '${turn} Wins!';
+        messageEl.textContent = `${turn} Wins`;
     } else if (board.every((cell) => cell)){
         tie = true;
-        messageEl.textContent = 'I`ts a Tie!';
+        messageEl.textContent = `I'ts a Tie!`;
     } else {
         turn = turn === 'X'? 'O': 'X';
-        messageEl.textContent = 'I`ts ${turn}`s turn';
+        messageEl.textContent = `I'ts ${turn} 's turn`;
     }
 }
 
@@ -82,7 +82,7 @@ function checkWinner(){
 }
 
 function init(){
-    messageEl.textContent = 'I`ts ${turn} turn';
+    messageEl.textContent = `I'ts ${turn} turn`;
     squareEls.forEach((square) => {
         square.textContent = '';
     });
