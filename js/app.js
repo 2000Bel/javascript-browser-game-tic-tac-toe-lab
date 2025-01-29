@@ -16,8 +16,8 @@
 
 
 /*-------------------------------- Constants --------------------------------*/
-   
-        const winningCombinations= [
+
+        const winningCombos= [
         [0, 1, 2],
         [3, 4, 5],
         [6, 7, 8],
@@ -29,15 +29,15 @@
         ];
 
 /*---------------------------- Variables (state) ----------------------------*/
-
-let  board = Array(9).fill(null);
+let board = ["", "", "", "", "", "", "", "", ""];
 let turn = 'X';  
-let winner = null;
+let winner = false;
 let tie = false;
 
 /*------------------------ Cached Element References ------------------------*/
     
 const squareEls = document.querySelectorAll('.sqr');
+
 const messageEl = document.getElementById('message');
 
 /*----------------------------- Event Listeners -----------------------------*/
@@ -47,7 +47,6 @@ squareEls.forEach((square) => {
 });
 
 /*-------------------------------- Functions --------------------------------*/
- 
 function handleClick (event) {
     const index = event.target.id;
 
@@ -57,7 +56,8 @@ function handleClick (event) {
 
     board[index] = turn;
     event.target.textContent = turn;
-
+ 
+    //updateMessage
     if(checkWinner()){
         messageEl.textContent = `${turn} Wins`;
     } else if (board.every((cell) => cell)){
@@ -69,9 +69,19 @@ function handleClick (event) {
     }
 }
 
+function updateBoard(){
+       board.forEach((value, index) =>{
+           squareEls[index].textContent = value;
+       })
+    }
+
+    function render(){
+        updateMessage();
+        updateBoard();
+    }
 function checkWinner(){
     let hasWiner = false;
-    winningCombinations.forEach((combination) => {
+    winningCombos.forEach((combination) => {
         const [a,b,c] =combination;
         if (board[a] && board[a] === board[b] && board[a] === board[c]) {
             winner = board[a];
