@@ -37,15 +37,14 @@ let tie = false;
 /*------------------------ Cached Element References ------------------------*/
     
 const squareEls = document.querySelectorAll('.sqr');
-
 const messageEl = document.getElementById('message');
-
+const  resertBtnel = document.getElementById ('reset');
 /*----------------------------- Event Listeners -----------------------------*/
 
 squareEls.forEach((square) => {
     square.addEventListener('click', handleClick)
 });
-
+resertBtnel.addEventListener('click', init);
 /*-------------------------------- Functions --------------------------------*/
 function handleClick (event) {
     const index = event.target.id;
@@ -53,49 +52,51 @@ function handleClick (event) {
     if (board[index] || winner) {
         return;
     }
-
+//function updateMessage(){
     board[index] = turn;
     event.target.textContent = turn;
- 
-    //updateMessage
+
     if(checkWinner()){
         messageEl.textContent = `${turn} Wins`;
-    } else if (board.every((cell) => cell)){
+    } else if (!winner && board.every (cell => cell !=="")){
         tie = true;
-        messageEl.textContent = `I'ts a Tie!`;
+        messageEl.textContent = `It's a Tie!`;
     } else {
         turn = turn === 'X'? 'O': 'X';
-        messageEl.textContent = `I'ts ${turn} 's turn`;
+        messageEl.textContent = `It's ${turn} 's turn`;
     }
 }
 
-function updateBoard(){
+ function updateBoard(){
        board.forEach((value, index) =>{
            squareEls[index].textContent = value;
        })
     }
 
     function render(){
-        updateMessage();
         updateBoard();
     }
+
 function checkWinner(){
-    let hasWiner = false;
+    let hasWinner = false;
     winningCombos.forEach((combination) => {
         const [a,b,c] =combination;
         if (board[a] && board[a] === board[b] && board[a] === board[c]) {
             winner = board[a];
-            hasWiner = true;
+            hasWinner = true;
         }
     });
-    return hasWiner;
+    return hasWinner;
 }
 
 function init(){
-    messageEl.textContent = `I'ts ${turn} turn`;
+    messageEl.textContent = `It's ${turn} turn`;
     squareEls.forEach((square) => {
         square.textContent = '';
     });
 }
 
 init();
+
+
+
