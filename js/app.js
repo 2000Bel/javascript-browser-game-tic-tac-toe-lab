@@ -1,102 +1,267 @@
+let playerScore = 100;
 
-//1) Define the required variables used to track the state of the game.
-  
-//2) Store cached element references
+const cosmonaut = document.getElementById('cosmonaut');
 
-//3) Upon loading, the game state should be initialized, and a function should 
-//   be called to render this game state.
+const scoreDisplay = document.getElementById('score');
 
-//4) The state of the game should be rendered to the user.
+const resetButton = document.getElementById('reset-button');
 
-//5) Define the required constants.
-
-//6) Handle a player clicking a square with a `handleClick` function.
-
-//7) Create Reset functionality.
+let gameInterval, asteroidInterval, powerInterval;
 
 
-/*-------------------------------- Constants --------------------------------*/
 
-        const winningCombos= [
-        [0, 1, 2],
-        [3, 4, 5],
-        [6, 7, 8],
-        [0, 3, 6],
-        [1, 4, 7],
-        [2, 5, 8],
-        [0, 4, 8],
-        [2, 4, 6]
-        ];
+// Movimiento del cosmonauta
 
-/*---------------------------- Variables (state) ----------------------------*/
-let board = ["", "", "", "", "", "", "", "", ""];
-let turn = 'X';  
-let winner = false;
-let tie = false;
+let cosmonautPosition = 50;
 
-/*------------------------ Cached Element References ------------------------*/
-    
-const squareEls = document.querySelectorAll('.sqr');
-const messageEl = document.getElementById('message');
-const  resertBtnel = document.getElementById ('reset');
-/*----------------------------- Event Listeners -----------------------------*/
 
-squareEls.forEach((square) => {
-    square.addEventListener('click', handleClick)
+
+document.addEventListener('keydown', (event) => {
+
+    if (event.key === 'ArrowLeft' && cosmonautPosition > 0) {
+
+        cosmonautPosition -= 5;
+
+    } else if (event.key === 'ArrowRight' && cosmonautPosition < 95) {
+
+        cosmonautPosition += 5;
+
+    }
+
+    cosmonaut.style.left = cosmonautPosition + '%';
+
 });
-resertBtnel.addEventListener('click', init);
-/*-------------------------------- Functions --------------------------------*/
-function handleClick (event) {
-    const index = event.target.id;
 
-    if (board[index] || winner) {
-        return;
-    }
-//function updateMessage(){
-    board[index] = turn;
-    event.target.textContent = turn;
 
-    if(checkWinner()){
-        messageEl.textContent = `${turn} Wins`;
-    } else if (!winner && board.every (cell => cell !=="")){
-        tie = true;
-        messageEl.textContent = `It's a Tie!`;
-    } else {
-        turn = turn === 'X'? 'O': 'X';
-        messageEl.textContent = `It's ${turn} 's turn`;
-    }
-}
 
- function updateBoard(){
-       board.forEach((value, index) =>{
-           squareEls[index].textContent = value;
-       })
-    }
+// Crear asteroides
 
-    function render(){
-        updateBoard();
-    }
+function createAsteroid() {
 
-function checkWinner(){
-    let hasWinner = false;
-    winningCombos.forEach((combination) => {
-        const [a,b,c] =combination;
-        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-            winner = board[a];
-            hasWinner = true;
+    const asteroid = document.createElement('div');
+
+    asteroid.classList.add('asteroid');
+
+    asteroid.style.left = Math.random() * 100 + '%';
+
+    asteroid.style.top = '-30px';
+
+    document.getElementById('game-container').appendChild(asteroid);
+
+
+
+    // Mover asteroide
+
+    let asteroidPosition = 0;
+
+    const fallInterval = setInterval(() => {
+
+        asteroidPosition += 5;
+
+        asteroid.style.top = asteroidPosition + 'px';
+
+
+
+        // Colisión con cosmonauta
+
+        if (checkCollision(asteroid)) {
+
+            playerScore -= getRandomPoints();
+
+            scoreDisplay.textContent = 'Puntos: ' + playerScore;
+
+            clearInterval(fallInterval);
+
+            asteroid.remove();
+
         }
-    });
-    return hasWinner;
+
+
+
+        // Eliminar asteroide si llega al fondo
+
+        if (asteroidPosition > window.innerHeight) {
+
+            clearInterval(fallInterval);
+
+            asteroid.remove();
+
+        }
+
+    }, 50);
+
 }
 
-function init(){
-    messageEl.textContent = `It's ${turn} turn`;
-    squareEls.forEach((square) => {
-        square.textContent = '';
-    });
+
+
+// Crear poderes
+
+function createPower() {
+
+    const power = document.createElement('div');
+
+    power.classList.add('power');
+
+    power.style.left = Math.random() * 100 + '%';
+
+    power.style.top = '-30px';
+
+    document.getElementById('game-container').appendChild(power);
+
+
+
+    // Mover poder
+
+    let powerPosition = 0;
+
+    const fallInterval = setInterval(() => {
+
+        powerPosition += 5;
+
+        power.style.top = powerPosition + 'px';
+
+
+
+        // Colisión con cosmonauta
+
+        if (checkCollision(power)) {
+
+            playerScore += getPowerPoints();
+
+            scoreDisplay.textContent = 'Puntos: ' + playerScore;
+
+            clearInterval(fallInterval);
+
+            power.remove();
+
+        }
+
+
+
+        // Eliminar poder si llega al fondo
+
+        if (powerPosition > window.innerHeight) {
+
+            clearInterval(fallInterval);
+
+            power.remove();
+
+        }
+
+    }, 50);
+
 }
 
-init();
+
+
+// Comprobar colisión entre el cosmonauta y un objeto
+
+function checkCollision(object) {
+
+    const cosmonautRect = cosmonaut.getBoundingClientRect();
+
+    const objectRect = object.getBoundingClientRect();
 
 
 
+    return !(cosmonautRect.right < objectRect.left ||
+
+        cosmonautRect.left > objectRect.right ||
+
+        cosmonautRect.bottom < objectRect.top ||
+
+        cosmonautRect.top > objectRect.bottom);
+
+}
+
+
+
+// Obtener puntos aleatorios para asteroides
+
+function getRandomPoints() {
+
+    const points = [1, 5, 10];
+
+    return points[Math.floor(Math.random() * points.length)];
+
+}
+
+
+
+// Obtener puntos de poder aleatorios
+
+function getPowerPoints() {
+
+    const points = [2, 10, 20];
+
+    return points[Math.floor(Math.random() * points.length)];
+
+}
+
+
+
+// Iniciar el juego
+
+function startGame() {
+
+    playerScore = 100;
+
+    scoreDisplay.textContent = 'Puntos: ' + playerScore;
+
+
+
+    gameInterval = setInterval(() => {
+
+        if (playerScore <= 0) {
+
+            clearInterval(gameInterval);
+
+            clearInterval(asteroidInterval);
+
+            clearInterval(powerInterval);
+
+            alert('¡Game Over! Has perdido.');
+
+        } else if (playerScore >= 1000) {
+
+            clearInterval(gameInterval);
+
+            clearInterval(asteroidInterval);
+
+            clearInterval(powerInterval);
+
+            alert('¡Felicidades! Has ganado el juego.');
+
+        }
+
+    }, 100);
+
+
+
+    asteroidInterval = setInterval(createAsteroid, 2000);
+
+    powerInterval = setInterval(createPower, 4000);
+
+}
+
+
+
+// Función de reinicio
+
+resetButton.addEventListener('click', () => {
+
+    clearInterval(gameInterval);
+
+    clearInterval(asteroidInterval);
+
+    clearInterval(powerInterval);
+
+    startGame();
+
+});
+
+
+
+// Iniciar juego al cargar la página
+
+startGame();
